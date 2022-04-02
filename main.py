@@ -22,7 +22,7 @@ class MainWindow(QObject):
 
     # Function PlayVsComputer
     @Slot(str, str)
-    def startPlayVsPlayer(self, namePlayer1:str, namePlayer2:str):
+    def start(self, namePlayer1:str, namePlayer2:str):
         """
         Start a new game with a other player
 
@@ -30,21 +30,11 @@ class MainWindow(QObject):
             namePlayer1 (str): Name of player 1
             namePlayer2 (str): Name of the second player 
         """
-        self.game = Game(namePlayer1, namePlayer2)
-        self.status.emit(self.game.status())
+        if namePlayer2 == "None": self.game = Game(namePlayer1)
+        else: self.game = Game(namePlayer1, namePlayer2)
+        self.status.emit(f"Il y a {self.game.nb_allumettes} allumettes\n A {self.game.whoPlay} de jouer")
         
-    # Function PlayVsPlayer
-    @Slot(str)
-    def startPlayVsComputer(self, namePlayer:str):
-        """
-        Start a new game vs the computer
 
-        Args:
-            namePlayer (_type_): Name of player
-        """
-        self.game = Game(namePlayer)
-        self.status.emit(self.game.status())
-    
     @Slot(int)
     def nextRound(self, nb_allumettes_en_moins:int):
         """
@@ -53,17 +43,30 @@ class MainWindow(QObject):
         Args:
             nb_allumettes_en_moins (int): Number of matches removed
         """
-        self.game.play(nb_allumettes_en_moins)
-        status= self.game.status()
-        self.status.emit(status)
-        if "perdu" in status:
-            self.win.emit()
+        status = ""
+        if not self.game.isWin:
+            if self.game.removeAllumettes(nb_allumettes_en_moins):
+                self.game.lessAllumettes = nb_allumettes_en_moins
+            else: self.status.emit(f"Vous pouvez seulement retirer entre 1 et {self.game.max_allumettes_retiree} allumettes. Et vous ne pouvez pas retirer plus {self.game.nb_allumettes} allumette(s).")
 
-        if self.game.player2_name == self.game.computerName:
-            self.retire_allumettes.emit(self.game.machine_retire_allumettes)
+            if self.game.nb_allumettes_global != self.game.nb_allumettes:
+                status += f"{self.game.whoPlay} prend {self.game.lessAllumettes} allumette(s). Il reste {self.game.nb_allumettes} allumette(s). "
+            
+            #Changement de joueur pour que le suivant joue
+            self.game.whoPlay = self.game.player1_name if self.game.whoPlay == self.game.player2_name else self.game.player2_name
+            
+            
+            if not self.game.checkWin():
+                if self.game.whoPlay == self.game.computerName: self.game.computerPlay(); self.retire_allumettes.emit(self.game.lessAllumettes); status = f"{self.game.whoPlay} prend {self.game.lessAllumettes} allumette(s). Il reste {self.game.nb_allumettes} allumette(s). "; self.game.whoPlay = self.game.player1_name if self.game.whoPlay == self.game.player2_name else self.game.player2_name
+                if self.game.nb_allumettes <= 0: self.status.emit(f"Nous avons un gagnant! {self.game.whoPlay} a gagné."); self.win.emit()
+                else: status+=f"Au tour de {self.game.whoPlay}!"; self.status.emit(status)
+            
+            else: self.status.emit(f"Nous avons un gagnant! {self.game.whoPlay} a gagné."); self.win.emit()
         
-        if self.game.iswin == True:
-            self.win.emit()
+        
+        
+        
+
             
 # INSTACE CLASS
 if __name__ == "__main__":
