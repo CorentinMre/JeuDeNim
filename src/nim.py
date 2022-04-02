@@ -1,17 +1,18 @@
+from os import system
+
 class Game:
     """
     Class Game
     for the game "NIM"
     """
     
-    def __init__(self, namePlayer1:str, namePlayer2 = None, nb_allumettes:int = 12, max_allumettes_retiree:int = 3):
+    def __init__(self, namePlayer1:str, namePlayer2 = None, nb_allumettes:int = 12):
         """Innitialisation du jeu
 
         Args:
             namePlayer1 (_type_): Name of player 1
             namePlayer2 (_type_, optional): Name of second player (if there is one). Defaults to None.
             nb_allumettes (int, optional): total number of matches(allumettes). Defaults to 12.
-            max_allumettes_retiree (int, optional): max matches removed. Defaults to 3.
         """
         self.computerName = "L'ordinateur"
         self.player1_name = namePlayer1
@@ -20,29 +21,24 @@ class Game:
         self.whoPlay = self.player1_name
         self.allumettes = '|'
         self.nb_allumettes = nb_allumettes
-        self.max_allumettes_retiree = max_allumettes_retiree
-        self.machine_retire_allumettes = 0
-        self.infoMachine = ""
-        self.infoPlayer = ""
-        self.iswin = False
-        self.islose = False
+        self.max_allumettes_retiree = 3
+        self.lessAllumettes = 0
         self.nb_allumettes_for_game_over = self._algorithmForTheComputer()
+        self.nb_allumettes_global = self.nb_allumettes
+        self.isWin = False
         
+
     def _algorithmForTheComputer(self):
+        """
+        Algorithm for the computer
+
+        Returns:
+            list: Return a list of all the number to make the opponent lose. Ex. [5, 9, 13] (for max_allumettes_retiree = 3)
+        """
         possible = []
         for i in range(self.nb_allumettes//self.max_allumettes_retiree):
             possible.append((self.max_allumettes_retiree*2-1)+(self.max_allumettes_retiree+1)*(i-1))
         return possible
-        
-    def playerPlay(self, allumettes_a_retirer:int):
-        """
-        A player play
-        """
-        
-        if allumettes_a_retirer <=  self.max_allumettes_retiree and allumettes_a_retirer >= 1 and allumettes_a_retirer < self.nb_allumettes:
-            self.nb_allumettes -= allumettes_a_retirer
-            self.infoPlayer = f"{self.whoPlay} prend {allumettes_a_retirer} allumette(s)"
-        elif allumettes_a_retirer == self.nb_allumettes: self.islose = True
         
 
     def computerPlay(self):
@@ -50,46 +46,100 @@ class Game:
         The computer play
         """
 
-        if self.nb_allumettes in self.nb_allumettes_for_game_over: self.machine_retire_allumettes = 1
+        if self.nb_allumettes in self.nb_allumettes_for_game_over: self.lessAllumettes = 1
         else:
-            self.machine_retire_allumettes = self.max_allumettes_retiree
-            while not self.nb_allumettes-self.machine_retire_allumettes in self.nb_allumettes_for_game_over: self.machine_retire_allumettes -= 1
+            self.lessAllumettes = self.max_allumettes_retiree
+            while not self.nb_allumettes-self.lessAllumettes in self.nb_allumettes_for_game_over: self.lessAllumettes -= 1
 
-        self.nb_allumettes -= self.machine_retire_allumettes
-        self.infoMachine = f"{self.player2_name} prend {self.machine_retire_allumettes} allumette(s)"
-        
-    def status(self):
+        self.nb_allumettes -= self.lessAllumettes
+
+
+    def removeAllumettes(self, nb):
+        """Remove allumettes
+
+        Args:
+            nb (int): nb of allumettes to remove
+
+        Returns:
+            bool: Return True if it's possible to remove allumettes, else False
         """
-        Display the status of the game
-        """
-        if self.islose:
-            if self.whoPlay == self.player1_name: return f"{self.player2_name} à perdu. Il est le dernier à avoir pris des allumettes."
-            else: return f"{self.player1_name} à perdu. Il est le dernier à avoir pris des allumettes." 
-        
-        if self.iswin:
-            if self.whoPlay != self.player1_name: return f"{self.player1_name} a gagné, {self.player2_name} est le dernier à prendre une allumette."
-            else: return f"{self.player2_name} a gagné, {self.player1_name} est le dernier à prendre une allumette."
-
-        if self.whoPlay != self.computerName and self.player2_name == self.computerName: return f"{self.infoMachine}\nIl reste {self.nb_allumettes} allumette(s)\nA {self.whoPlay} de jouer."
-        else: return f"{self.infoPlayer}\nIl reste {self.nb_allumettes} allumette(s)\nA {self.whoPlay} de jouer."
-
+        if nb >0 and nb <= self.nb_allumettes and nb <= self.max_allumettes_retiree:
+            self.nb_allumettes -= nb
+            return True
+        else: return False
     
-    def play(self,nb_allumettes_a_retirer:int):
+
+    def checkWin(self):
         """
-        launch the game
+        Check if the game is win
+
+        Returns:
+            bool: Return True if the game is win, else False
         """
+        if self.nb_allumettes == 0:
+            self.isWin = True
+            return True
+        else: return False
+    
+    def displayAllumettes(self):
+        """Display allumettes
+
+        Returns:
+            str: return the number of allumettes. Ex. "||||||"
+        """
+        return self.allumettes*self.nb_allumettes
+    
+
+
+
+if __name__ == "__main__":
+    
+    playVsComputer = input("Voulez vous jouer contre l'ordinateur ? (y/n) : ").upper()
+    if playVsComputer == "Y":
+        name = input("Entrez votre nom : ")
+        nbAllummettes = int(input("Entrez le nombre d'allumettes : "))
+        game = Game(name, nb_allumettes=nbAllummettes)
+    elif playVsComputer == "N":
+        name1 = input("Entrez le nom du joueur 1 : ")
+        name2 = input("Entrez le nom du joueur 1 : ")
+        nbAllummettes = int(input("Entrez le nombre d'allumettes : "))
+        game = Game(name1, name2, nb_allumettes=nbAllummettes)
+    else: print("Vous n'avez pas entré un choix valide"); exit()
+    
+    
+    
+    while not game.isWin:
         
-        if self.nb_allumettes != 1:
-            if self.whoPlay == self.player1_name:
-                self.playerPlay(nb_allumettes_a_retirer)
-                self.whoPlay = self.player2_name
-            
-            elif self.whoPlay != self.computerName and self.whoPlay == self.player2_name:
-                self.playerPlay(nb_allumettes_a_retirer)
-                self.whoPlay = self.player1_name
-        if self.nb_allumettes != 1:
-            if self.whoPlay == self.player2_name and self.player2_name == self.computerName:
-                self.computerPlay()
-                self.whoPlay = self.player1_name
-                
-        else: self.iswin = True
+        #Affichage des allumettes restantes
+        print(game.displayAllumettes())
+
+        print(f"\n[!] Au tour de {game.whoPlay}!")
+        
+        if game.whoPlay != game.computerName:
+            while True:
+                nb = int(input("[?] Combien d'allumettes voulez vous retirer: "))
+                game.lessAllumettes = nb
+                if game.removeAllumettes(nb): break
+                else: print(f"\n[!] Vous pouvez seulement retirer entre 1 et {game.max_allumettes_retiree} allumettes. Et vous ne pouvez pas retirer plus {game.nb_allumettes} allumette(s).")
+        else: game.computerPlay()
+        #Vérification de la victoire
+        game.checkWin()
+             
+        #Efface le terminal
+        _ = system("cls")
+        _ = system("clear")
+
+        if game.nb_allumettes_global != game.nb_allumettes:
+            print(f"\n{game.whoPlay} prend {game.lessAllumettes} allumette(s)")
+            print(f"Il reste {game.nb_allumettes} allumette(s)\n")
+
+        #Changement de joueur pour que le suivant joue
+        game.whoPlay = game.player1_name if game.whoPlay == game.player2_name else game.player2_name
+        
+
+    #Efface le terminal
+    _ = system("cls")
+    _ = system("clear")
+
+    #GAGNANT
+    print(f"\n[!] Nous avons un gagnant! {game.whoPlay} a gagné.")
