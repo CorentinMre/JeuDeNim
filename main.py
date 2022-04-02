@@ -44,26 +44,26 @@ class MainWindow(QObject):
             nb_allumettes_en_moins (int): Number of matches removed
         """
         status = ""
-        if not self.game.isWin:
-            if self.game.removeAllumettes(nb_allumettes_en_moins):
-                self.game.lessAllumettes = nb_allumettes_en_moins
-            else: self.status.emit(f"Vous pouvez seulement retirer entre 1 et {self.game.max_allumettes_retiree} allumettes. Et vous ne pouvez pas retirer plus {self.game.nb_allumettes} allumette(s).")
 
-            if self.game.nb_allumettes_global != self.game.nb_allumettes:
-                status += f"{self.game.whoPlay} prend {self.game.lessAllumettes} allumette(s). Il reste {self.game.nb_allumettes} allumette(s). "
-            
-            #Changement de joueur pour que le suivant joue
-            self.game.whoPlay = self.game.player1_name if self.game.whoPlay == self.game.player2_name else self.game.player2_name
-            
-            
-            if not self.game.checkWin():
-                if self.game.whoPlay == self.game.computerName: self.game.computerPlay(); self.retire_allumettes.emit(self.game.lessAllumettes); status = f"{self.game.whoPlay} prend {self.game.lessAllumettes} allumette(s). Il reste {self.game.nb_allumettes} allumette(s). "; self.game.whoPlay = self.game.player1_name if self.game.whoPlay == self.game.player2_name else self.game.player2_name
-                if self.game.nb_allumettes <= 0: self.status.emit(f"Nous avons un gagnant! {self.game.whoPlay} a gagné."); self.win.emit()
-                else: status+=f"Au tour de {self.game.whoPlay}!"; self.status.emit(status)
-            
-            else: self.status.emit(f"Nous avons un gagnant! {self.game.whoPlay} a gagné."); self.win.emit()
+        if self.game.removeAllumettes(nb_allumettes_en_moins):
+            self.game.lessAllumettes = nb_allumettes_en_moins
+        else: self.status.emit(f"Vous pouvez seulement retirer entre 1 et {self.game.max_allumettes_retiree} allumettes. Et vous ne pouvez pas retirer plus {self.game.nb_allumettes} allumette(s).")
+
+        if self.game.nb_allumettes_global != self.game.nb_allumettes:
+            status += f"{self.game.whoPlay} prend {self.game.lessAllumettes} allumette(s). Il reste {self.game.nb_allumettes} allumette(s). "
+        
+        #Changement de joueur pour que le suivant joue
+        self.game.whoPlay = self.game.player1_name if self.game.whoPlay == self.game.player2_name else self.game.player2_name
         
         
+        if not self.game.checkWin():
+            if self.game.whoPlay == self.game.computerName: self.game.computerPlay(); self.retire_allumettes.emit(self.game.lessAllumettes); status = f"{self.game.whoPlay} prend {self.game.lessAllumettes} allumette(s). Il reste {self.game.nb_allumettes} allumette(s). "; self.game.whoPlay = self.game.player1_name if self.game.whoPlay == self.game.player2_name else self.game.player2_name
+            if self.game.nb_allumettes <= 0: self.status.emit(f"Nous avons un gagnant! {self.game.whoPlay} a gagné."); self.win.emit()
+            else: status+=f"Au tour de {self.game.whoPlay}!"; self.status.emit(status)
+        
+        else: self.status.emit(f"Nous avons un gagnant! {self.game.whoPlay} a gagné."); self.win.emit()
+    
+    
         
         
 
