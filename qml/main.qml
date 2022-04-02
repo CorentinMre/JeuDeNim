@@ -68,7 +68,7 @@ Window{
                 btnAllumettes11.opacity= 1
                 btnAllumettes12.opacity= 1
                 btnSuivant.text = qsTr("Suivant")
-                backend.startPlayVsComputer(nameOfPlayer.text)
+                backend.start(nameOfPlayer.text, "None")
                 recPlay.visible = true
                 recAccueil.visible = false
             }else{
@@ -109,7 +109,7 @@ Window{
                 btnAllumettes12.opacity= 1
 
                 btnSuivant.text = qsTr("Suivant")
-                backend.startPlayVsPlayer(nameOfPlayer1.text, nameOfPlayer2.text)
+                backend.start(nameOfPlayer1.text, nameOfPlayer2.text)
                 recPlay.visible = true
                 recAccueil.visible = false
             }else{
