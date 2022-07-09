@@ -1,9 +1,8 @@
 import QtQuick 2.15
 import QtQuick.Window 6.0
 import QtQuick.Controls 2.15
-import "controls"
 import QtQuick.Controls.Material 2.15
-import Qt5Compat.GraphicalEffects 6.0
+
 
 
 Window{
@@ -395,42 +394,55 @@ Window{
             fillMode: Image.PreserveAspectFit
         }
 
-        Row {
-            id: rowBtns
+        Rectangle {
+            id: recBtns
             x: 330
             width: 70
             height: 35
             visible: true
+            color: "#00ffffff"
             anchors.right: parent.right
             anchors.top: parent.top
-            smooth: false
-            enabled: true
-            padding: 0
-            topPadding: 0
-            anchors.topMargin: 0
-            anchors.rightMargin: 0
 
-            TopBarButton{
+            Button {
                 id: btnMinimize
                 width: 35
-                height: 35
-                horizontalPadding: 4
-                padding: 4
-                btnColorDefault: "#1c1d20"
-                bottomPadding: 4
-                autoRepeatDelay: 300
-                btnColorClicked: "#1d8154"
-                onClicked: {
-                    window.showMinimized()
-                }
+                height: 47
+                opacity: 1
+                text: qsTr("—")
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.left: parent.left
+                font.underline: false
+                font.strikeout: false
+                flat: true
+                font.italic: true
+                font.bold: true
+                font.family: "LED Real"
+                font.pointSize: 15
+                anchors.leftMargin: 0
+                z: 0
+                onClicked: window.showMinimized()
             }
 
 
 
-            TopBarButton {
+            Button {
                 id: btnClose
-                btnColorClicked: "#ff0000"
-                btnIconSource: "../../images/svg_images/close_icon.svg"
+                x: 35
+                width: 35
+                height: 47
+                opacity: 1
+                text: "\u2715"
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.right: parent.right
+                down: false
+                flat: true
+                font.italic: false
+                font.bold: false
+                font.pointSize: 17
+                font.family: "ChromiumAATTest"
+                anchors.rightMargin: 0
+                z: 0
                 onClicked: window.close()
             }
         }
@@ -1071,8 +1083,4 @@ Window{
 
 
 
-/*##^##
-Designer {
-    D{i:0;formeditorZoom:1.25}
-}
-##^##*/
+
